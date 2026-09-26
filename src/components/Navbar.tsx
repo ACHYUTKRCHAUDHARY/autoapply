@@ -1,3 +1,13 @@
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-export default async function Navbar(){const {data:{user}}=await createClient().auth.getUser(); return <header className="border-b border-line"><nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-5 md:px-10"><Link href="/" className="font-display text-2xl font-semibold">AutoApply<span className="text-signal">.</span></Link><div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">{user?<><Link href="/dashboard">Dashboard</Link><Link href="/jobs">Matches</Link><Link href="/applications">Applications</Link><Link href="/analytics">Analytics</Link><Link href="/notifications">Notifications</Link><Link href="/profile">Profile</Link><form action="/auth/signout" method="post"><button>Sign out</button></form></>:<Link href="/login">Sign in</Link>}</div></nav></header>}
+import {createClient} from '@/lib/supabase/server';
+import NavLinks from './NavLinks';
+
+export default async function Navbar(){
+ const {data:{user}}=await createClient().auth.getUser();
+ return <header className="site-header border-b border-line bg-paper/95">
+  <nav aria-label="Main navigation" className="mx-auto flex max-w-6xl items-center justify-between gap-5 px-5 py-5 md:px-10">
+   <Link href={user?'/dashboard':'/'} className="font-display text-2xl font-semibold tracking-tight">AutoApply<span className="text-signal">.</span></Link>
+   {user?<><div className="hidden items-center gap-5 text-sm md:flex"><NavLinks/></div><details className="relative md:hidden"><summary className="button-plain cursor-pointer list-none">Menu</summary><div className="absolute right-0 top-11 z-30 w-52 rounded-card border border-line bg-white p-4 shadow-lg"><NavLinks/></div></details></>:<Link href="/login" className="button-plain">Sign in →</Link>}
+  </nav>
+ </header>;
+}

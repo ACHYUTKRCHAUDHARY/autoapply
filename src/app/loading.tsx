@@ -1,0 +1,1 @@
+export default function Loading(){return <div aria-live="polite" className="animate-pulse py-10"><span className="eyebrow">Loading your workspace</span><div className="mt-6 h-14 max-w-lg bg-line/60"/><div className="mt-10 h-24 bg-line/40"/><div className="mt-4 h-24 bg-line/40"/></div>}

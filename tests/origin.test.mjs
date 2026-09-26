@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {isAllowedMutation} from '../src/lib/origin.ts';
+test('same origin mutation accepted',()=>assert.equal(isAllowedMutation(new Headers({origin:'https://app.example.com','sec-fetch-site':'same-origin'}),'https://app.example.com'),true));
+test('cross origin and malformed origin rejected',()=>{assert.equal(isAllowedMutation(new Headers({origin:'https://evil.example.com'}),'https://app.example.com'),false);assert.equal(isAllowedMutation(new Headers({origin:'invalid'}),'https://app.example.com'),false);assert.equal(isAllowedMutation(new Headers({'sec-fetch-site':'cross-site'}),'https://app.example.com'),false)});

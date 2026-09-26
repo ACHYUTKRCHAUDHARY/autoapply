@@ -1,0 +1,2 @@
+'use client';
+export default function ErrorPage({reset}:{error:Error&{digest?:string};reset:()=>void}){return <div role="alert" className="mx-auto max-w-xl py-20"><p className="eyebrow">Something interrupted the page</p><h1 className="mt-4 font-display text-4xl">We couldn’t load this view.</h1><p className="mt-4 text-sm leading-6 text-ink/60">Your data is still in your workspace. Try loading it again.</p><button className="button mt-7" onClick={reset}>Try again</button></div>}

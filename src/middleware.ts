@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import {isAllowedMutation} from '@/lib/origin';
 export async function middleware(request: NextRequest) {
+  if(!['GET','HEAD','OPTIONS'].includes(request.method)&&!isAllowedMutation(request.headers,request.nextUrl.origin))return NextResponse.json({error:'Cross-site request blocked'},{status:403});
   let response = NextResponse.next({ request });
   const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookies: { getAll() { return request.cookies.getAll(); }, setAll(values: {name:string;value:string;options:CookieOptions}[]) { values.forEach(({ name, value }) => request.cookies.set(name, value)); response = NextResponse.next({ request }); values.forEach(({ name, value, options }) => response.cookies.set(name, value, options)); } }

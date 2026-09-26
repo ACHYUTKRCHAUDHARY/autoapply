@@ -1,0 +1,8 @@
+import Link from 'next/link';
+const steps=[
+ {label:'Add your resume',detail:'We extract text from a private PDF or DOCX.',href:'/profile'},
+ {label:'Set your direction',detail:'Write the role and location you want.',href:'/profile'},
+ {label:'Explore matches',detail:'Score openings and generate review drafts.',href:'/jobs'},
+ {label:'Review before applying',detail:'Edit a draft, approve it and submit yourself.',href:'/applications'}
+];
+export default function OnboardingSteps({done}:{done:boolean[]}){const next=done.findIndex(x=>!x);return <section aria-labelledby="setup-heading" className="surface mt-10 overflow-hidden"><div className="flex flex-wrap items-end justify-between gap-4 border-b border-line px-6 py-6 md:px-8"><div><p className="eyebrow">Getting started</p><h2 id="setup-heading" className="mt-2 font-display text-3xl">Your search, in four steps.</h2></div><p className="text-sm text-ink/60">{done.filter(Boolean).length} of 4 complete</p></div><ol className="grid md:grid-cols-2">{steps.map((step,index)=><li key={step.label} className={`border-b border-line px-6 py-6 md:px-8 ${index%2===0?'md:border-r':''}`}><div className="flex gap-4"><span aria-label={done[index]?'Complete':undefined} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm ${done[index]?'border-signal bg-signal text-white':'border-line text-ink/60'}`}>{done[index]?'✓':`0${index+1}`}</span><div><h3 className="font-display text-xl">{step.label}</h3><p className="mt-1 text-sm leading-6 text-ink/60">{step.detail}</p>{index===next&&<Link href={step.href} className="mt-3 inline-block text-sm font-semibold text-signal underline underline-offset-4">Continue →</Link>}</div></div></li>)}</ol></section>}

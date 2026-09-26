@@ -1,5 +1,6 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {resumeKind} from '../src/lib/resume.ts';
+import test from 'node:test';import assert from 'node:assert/strict';import {resumeKind,resumePath} from '../src/lib/resume.ts';
 const pdf=new TextEncoder().encode('%PDF-1.7');const zip=new Uint8Array([0x50,0x4b,0x03,0x04]);
 test('accepts matching MIME, extension and file signature',()=>{assert.equal(resumeKind('cv.PDF','application/pdf',pdf.length,pdf),'pdf');assert.equal(resumeKind('cv.docx','application/vnd.openxmlformats-officedocument.wordprocessingml.document',zip.length,zip),'docx')});
 test('rejects spoofed extension and mismatched signatures',()=>{assert.equal(resumeKind('cv.docx','application/pdf',pdf.length,pdf),undefined);assert.equal(resumeKind('cv.pdf','application/pdf',zip.length,zip),undefined);assert.equal(resumeKind('cv.docx','application/vnd.openxmlformats-officedocument.wordprocessingml.document',pdf.length,pdf),undefined)});
 test('rejects empty and oversized resumes',()=>{assert.equal(resumeKind('cv.pdf','application/pdf',0,pdf),undefined);assert.equal(resumeKind('cv.pdf','application/pdf',5*1024*1024+1,pdf),undefined)});
+test('resume path is limited to the signed-in user and UUID filename',()=>{const id='a34222d7-4f1e-46e6-8ec2-6fdd9697e44a';assert.equal(resumePath(id,`${id}/fd9c8740-e35f-4b5f-a077-a3e7e3d4a22e.pdf`),true);assert.equal(resumePath(id,'other-user/fd9c8740-e35f-4b5f-a077-a3e7e3d4a22e.pdf'),false);assert.equal(resumePath(id,`${id}/../resume.pdf`),false)});
