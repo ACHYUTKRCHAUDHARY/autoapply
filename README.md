@@ -1,6 +1,6 @@
 # AutoApply
 
-An editorial job-search workspace built with Next.js 14 App Router, TypeScript, Supabase, Gemini and a separate Playwright worker. A match above 70% creates a draft for review. **The web app never submits an application.** Users open the posting and submit themselves, then record the result.
+An editorial job-search workspace built with Next.js 16 App Router, TypeScript, Supabase, Gemini and a separate Playwright worker. A match above 70% creates a draft for review. **The web app never submits an application.** Users open the posting and submit themselves, then record the result.
 
 ## Setup
 
@@ -30,4 +30,4 @@ Read [product requirements](docs/product-requirements.md) and the [launch checkl
 
 ## Checks
 
-`npm run typecheck`, `npm test`, `npm run build`; run `npm run typecheck` in `worker` too. Live Supabase, Gemini and job-source integration require configured credentials and are not mocked as passing.
+`npm run typecheck`, `npm test`, `npm run build` and `npm audit --audit-level=high`; run `npm run typecheck` and `npm audit --omit=dev --audit-level=high` in `worker` too. The isolated staging browser journey is in `tests/e2e/staging.spec.mjs`; configure and run it using [the staging guide](docs/staging-e2e.md). Live Supabase, Gemini and job-source integration require configured credentials and are not mocked as passing.

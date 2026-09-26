@@ -13,7 +13,7 @@ export function runJSON<T>(prompt: string): Promise<T> {
     nextSlot = slot + 4400; // ~13.6 requests/minute per process.
     const delay = slot - Date.now(); if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
     // Atomic reservation keeps separate Vercel instances within the shared quota.
-    const {data:waitMs,error}=await createClient().rpc('reserve_gemini_slot');
+    const {data:waitMs,error}=await (await createClient()).rpc('reserve_gemini_slot');
     if(error || typeof waitMs!=='number') throw new Error('Gemini quota reservation unavailable');
     if(waitMs>0) await new Promise(resolve=>setTimeout(resolve,waitMs));
     const model = new GoogleGenerativeAI(process.env.GEMINI_API_KEY).getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: 'application/json' } });

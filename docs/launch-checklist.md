@@ -24,8 +24,8 @@
 ## Deploy and observe
 
 - [ ] Review GitHub Actions result and Vercel preview build.
-- [ ] Resolve the Next.js 14 high/critical dependency audit findings through an approved supported-version migration; rerun build, tests and audit.
+- [x] Migrate to Next.js 16.3.6 and React 19; build, tests and full npm audit pass locally. Confirm the same gates in GitHub Actions.
 - [ ] Set monitoring for Function errors and job-source failures; avoid logging resume text or secrets.
 - [ ] Test daily cron and record last successful sync.
 - [ ] Keep the Render worker private and unconnected to auto-submit until portal-specific selectors and policy are validated.
-- [ ] Run a real end-to-end staging test before announcing production readiness.
+- [ ] Run `Staging end-to-end` GitHub workflow against an isolated Supabase staging project and deployment; inspect the browser trace on failure. It creates two users, inserts one job, runs Gemini and deletes test data.

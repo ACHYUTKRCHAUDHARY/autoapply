@@ -3,11 +3,12 @@ import {session} from '@/lib/http';import FindMatchesButton from '@/components/F
 import type {MatchResult} from '@/lib/types';
 type Filters={score?:string;location?:string;type?:string;page?:string};
 const escapeLike=(value:string)=>value.replace(/[\\%_]/g,'\\$&');
-export default async function JobsPage({searchParams}:{searchParams:Filters}){
+export default async function JobsPage({searchParams}:{searchParams:Promise<Filters>}){
  const {supabase,user}=await session();if(!user)redirect('/login');
- const score=[0,50,70,85].includes(Number(searchParams.score))?Number(searchParams.score):0;
- const location=(searchParams.location||'').slice(0,80).trim();const type=(searchParams.type||'').slice(0,80).trim();
- const page=Math.min(1000,Math.max(1,Number.parseInt(searchParams.page||'1',10)||1));
+ const filters=await searchParams;
+ const score=[0,50,70,85].includes(Number(filters.score))?Number(filters.score):0;
+ const location=(filters.location||'').slice(0,80).trim();const type=(filters.type||'').slice(0,80).trim();
+ const page=Math.min(1000,Math.max(1,Number.parseInt(filters.page||'1',10)||1));
  let query=supabase.from('matches').select('*,jobs!inner(*)',{count:'exact'}).eq('user_id',user.id).gte('score',score);
  if(location)query=query.ilike('jobs.location',`%${escapeLike(location)}%`);
  if(type)query=query.ilike('jobs.job_type',`%${escapeLike(type)}%`);

@@ -51,4 +51,4 @@ Help an individual job seeker discover relevant openings, prepare accurate appli
 4. Operations: configure all secrets, cron, domain, monitoring and rollback; verify external API quotas and error messages.
 5. Privacy: publish a real privacy notice and retention policy before public onboarding. The UI disclosure alone is not a legal policy.
 
-**Current launch blocker (26 September 2026):** the locked Next.js 14 dependency is flagged by `npm audit --omit=dev --audit-level=high` for high/critical advisories, with no patched 14.x release offered in the audit. Do not describe this build as security-cleared until the version constraint is revisited and a supported version is migrated and verified.
+**Dependency gate (26 September 2026):** Next.js 16.3.6 and React 19 migration passes local build, TypeScript, unit tests and full npm audit. Live staging verification, provider credentials and deployment checks remain open.

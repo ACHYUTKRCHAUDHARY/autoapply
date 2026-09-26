@@ -6,3 +6,5 @@ worker/node_modules
 worker/.env
 worker/playwright-report
 *.tsbuildinfo
+test-results/
+playwright-report/
