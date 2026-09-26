@@ -1,0 +1,2 @@
+import type { Config } from 'tailwindcss';
+export default { content: ['./src/**/*.{ts,tsx}'], theme: { extend: { colors: { ink: '#14181F', paper: '#F7F6F3', signal: '#2F5D50', signal2: '#4C8577', warn: '#B5462A', line: '#E4E1D9' }, borderRadius: { card: '10px' }, fontFamily: { body: ['var(--font-inter)', 'sans-serif'], display: ['var(--font-fraunces)', 'serif'] } } }, plugins: [] } satisfies Config;

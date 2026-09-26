@@ -1,0 +1,6 @@
+export type ApplicationStatus = 'pending_review' | 'approved' | 'submitted' | 'viewed' | 'interview' | 'rejected' | 'withdrawn';
+export interface Profile { user_id: string; full_name: string | null; headline: string | null; skills: string[]; preferences: { keywords?: string; location?: string; job_type?: string }; resume_path: string | null; resume_text: string | null; created_at?: string }
+export interface Job { id: string; source: string; source_id: string; title: string; company: string; location: string; job_type: string; description: string; url: string; published_at: string | null; created_at?: string }
+export interface MatchResult { id: string; user_id: string; job_id: string; score: number; reasoning: string; created_at: string; jobs?: Job | null }
+export interface Application { id: string; user_id: string; job_id: string; match_id: string | null; status: ApplicationStatus; tailored_resume: string | null; cover_letter: string | null; submitted_at: string | null; created_at: string; jobs?: Job | null; matches?: { score: number } | null }
+export interface Notification { id: string; user_id: string; kind: string; title: string; body: string; read_at: string | null; created_at: string }

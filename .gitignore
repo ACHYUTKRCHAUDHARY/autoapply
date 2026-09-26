@@ -1,0 +1,8 @@
+node_modules
+.next
+.env.local
+.env
+worker/node_modules
+worker/.env
+worker/playwright-report
+*.tsbuildinfo

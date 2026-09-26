@@ -1,0 +1,9 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+:root { color-scheme:light; }
+body { background:#F7F6F3; color:#14181F; font-family:var(--font-inter),sans-serif; }
+.rule-dotted { border-top:1px dotted #a8aaa4; }
+.field { width:100%; background:white; border:1px solid #E4E1D9; border-radius:6px; padding:.7rem .8rem; outline-color:#2F5D50; }
+.button { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; padding:.65rem 1rem; border-radius:6px; background:#2F5D50; color:white; font-size:.88rem; font-weight:600; }
+.button:disabled { opacity:.55; cursor:not-allowed; }
+.button-plain { display:inline-flex; padding:.55rem .8rem; border:1px solid #E4E1D9; border-radius:6px; font-size:.85rem; }
+.eyebrow { color:#2F5D50; letter-spacing:.03em; font-size:.8rem; font-weight:600; }
