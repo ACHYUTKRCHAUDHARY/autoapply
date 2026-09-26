@@ -1,5 +1,6 @@
 import 'server-only';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createClient } from './supabase/server';
 import type { Job, Profile } from './types';
 
 // One process-wide queue; distributed deployments also need a shared limiter for strict global quotas.
@@ -11,6 +12,10 @@ export function runJSON<T>(prompt: string): Promise<T> {
     const slot = Math.max(Date.now(), nextSlot);
     nextSlot = slot + 4400; // ~13.6 requests/minute per process.
     const delay = slot - Date.now(); if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+    // Atomic reservation keeps separate Vercel instances within the shared quota.
+    const {data:waitMs,error}=await createClient().rpc('reserve_gemini_slot');
+    if(error || typeof waitMs!=='number') throw new Error('Gemini quota reservation unavailable');
+    if(waitMs>0) await new Promise(resolve=>setTimeout(resolve,waitMs));
     const model = new GoogleGenerativeAI(process.env.GEMINI_API_KEY).getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: 'application/json' } });
     const result = await model.generateContent(prompt);
     return JSON.parse(result.response.text()) as T;

@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {validateDraft} from '../src/lib/drafts.ts';
+test('draft requires a nonblank cover letter',()=>{assert.equal(validateDraft({tailored_resume:'',cover_letter:'  '}),false);assert.equal(validateDraft({tailored_resume:'',cover_letter:'Hello'}),true)});
+test('draft rejects non-string and oversized values',()=>{assert.equal(validateDraft({tailored_resume:42,cover_letter:'Hi'}),false);assert.equal(validateDraft({tailored_resume:'x'.repeat(20001),cover_letter:'Hi'}),false);assert.equal(validateDraft({tailored_resume:'',cover_letter:'x'.repeat(10001)}),false)});

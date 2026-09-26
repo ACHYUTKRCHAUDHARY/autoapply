@@ -1,0 +1,8 @@
+'use client';
+import {useState} from 'react';import {useRouter} from 'next/navigation';
+export default function DraftEditor({id,resume,letter}:{id:string;resume:string;letter:string}){
+ const [summary,setSummary]=useState(resume),[cover,setCover]=useState(letter),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');const router=useRouter();
+ const changed=summary!==resume||cover!==letter;
+ async function save(){setBusy(true);setNotice('');try{const response=await fetch(`/api/applications/${id}/draft`,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({tailored_resume:summary,cover_letter:cover})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not save draft');setNotice('Saved. Review and approve the updated draft.');router.refresh()}catch(error){setNotice(error instanceof Error?error.message:'Could not save draft')}finally{setBusy(false)}}
+ return <details className="mt-5"><summary className="cursor-pointer text-sm text-signal">Review and edit draft</summary><div className="mt-4 grid gap-4"><label className="text-sm">Resume suggestions<textarea className="field mt-2 min-h-40" maxLength={20000} value={summary} onChange={e=>setSummary(e.target.value)}/></label><label className="text-sm">Cover letter<textarea className="field mt-2 min-h-52" maxLength={10000} value={cover} onChange={e=>setCover(e.target.value)}/></label><div><button className="button" disabled={busy||!changed||!cover.trim()} onClick={save}>Save draft</button></div>{notice&&<p role="status" className="text-sm">{notice}</p>}</div></details>;
+}
