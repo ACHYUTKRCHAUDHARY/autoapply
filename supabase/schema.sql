@@ -7,8 +7,8 @@ create table if not exists public.profiles (
  created_at timestamptz not null default now()
 );
 create table if not exists public.jobs (
- id uuid primary key default gen_random_uuid(), source text not null,
- source_id text not null, title text not null, company text not null,
+ id uuid primary key default gen_random_uuid(), owner_id uuid references auth.users(id) on delete cascade,
+ source text not null, source_id text not null, title text not null, company text not null,
  location text not null default '', job_type text not null default '',
  description text not null default '', url text not null,
  published_at timestamptz, created_at timestamptz not null default now(),
@@ -40,6 +40,8 @@ create table if not exists public.notifications (
  kind text not null, title text not null, body text not null, read_at timestamptz,
  created_at timestamptz not null default now()
 );
+create index if not exists jobs_owner_id_idx on public.jobs(owner_id) where owner_id is not null;
+create unique index if not exists jobs_owner_url_unique on public.jobs(owner_id,url) where owner_id is not null;
 create index if not exists matches_user_score_idx on public.matches(user_id,score desc);
 create index if not exists applications_user_status_idx on public.applications(user_id,status);
 create index if not exists events_user_created_idx on public.application_events(user_id,created_at desc);
@@ -51,7 +53,7 @@ alter table public.applications enable row level security;
 alter table public.application_events enable row level security;
 alter table public.notifications enable row level security;
 -- Jobs are a shared read-only cache. Only authenticated users can read.
-create policy "jobs read" on public.jobs for select to authenticated using (true);
+create policy "jobs read" on public.jobs for select to authenticated using (owner_id is null or owner_id=auth.uid());
 create policy "profiles own" on public.profiles for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "matches own" on public.matches for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "applications read own" on public.applications for select to authenticated using (auth.uid() = user_id);
@@ -221,7 +223,35 @@ begin
  delete from public.matches where user_id=auth.uid();
  delete from public.notifications where user_id=auth.uid();
  delete from public.match_runs where user_id=auth.uid();
+ delete from public.jobs where owner_id=auth.uid();
  delete from public.profiles where user_id=auth.uid();
 end $$;
 revoke all on function public.purge_workspace() from public;
 grant execute on function public.purge_workspace() to authenticated;
+
+-- User-saved links stay private. Clients cannot insert jobs directly; this RPC enforces limits.
+create or replace function public.create_private_job(
+ p_url text, p_title text, p_company text, p_location text, p_job_type text, p_description text
+) returns uuid language plpgsql security definer set search_path = '' as $$
+declare v_id uuid; v_user uuid := auth.uid();
+begin
+ if v_user is null then raise exception 'Unauthorized'; end if;
+ if p_url is null or length(p_url)>2048 or p_url !~ '^https://[^[:space:]/?#@]+'
+    or p_title is null or length(trim(p_title)) not between 1 and 200
+    or p_company is null or length(trim(p_company)) not between 1 and 200
+    or p_description is null or length(trim(p_description)) not between 20 and 12000
+    or length(coalesce(p_location,''))>200 or length(coalesce(p_job_type,''))>100
+ then raise exception 'Invalid job details'; end if;
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_user::text,0));
+ select id into v_id from public.jobs where owner_id=v_user and url=p_url;
+ if v_id is not null then return v_id; end if;
+ if (select count(*) from public.jobs where owner_id=v_user)>=100
+ then raise exception 'Saved job limit reached'; end if;
+ insert into public.jobs(owner_id,source,source_id,title,company,location,job_type,description,url)
+ values(v_user,'manual',pg_catalog.gen_random_uuid()::text,trim(p_title),trim(p_company),
+        coalesce(trim(p_location),''),coalesce(trim(p_job_type),''),trim(p_description),p_url)
+ returning id into v_id;
+ return v_id;
+end $$;
+revoke all on function public.create_private_job(text,text,text,text,text,text) from public;
+grant execute on function public.create_private_job(text,text,text,text,text,text) to authenticated;

@@ -98,12 +98,27 @@ test.describe('configured staging project', () => {
   await page.goto('/analytics');
   await expect(page.getByText('Remote full time')).toBeVisible();
 
+  await page.goto('/jobs');
+  const privateLink=`https://www.linkedin.com/jobs/view/123?e2e=${suffix}`;
+  await page.getByLabel('Job posting link').fill(privateLink);
+  await page.getByLabel('Role title').fill('Backend Engineer');
+  await page.getByLabel('Company').fill('Private test company');
+  await page.getByLabel('Job description').fill('Build TypeScript and Java backend services for job applicants.');
+  await page.getByRole('button', { name: 'Save job link' }).click();
+  await expect(page.getByRole('status')).toContainText('Saved from LinkedIn');
+  const {data:hiddenJob}=await other.from('jobs').select('id').eq('url',privateLink);
+  expect(hiddenJob).toEqual([]);
+  const {data:ownedJob}=await admin.from('jobs').select('id').eq('url',privateLink).single();
+  expect(ownedJob?.id).toBeTruthy();
+
   await page.goto('/profile');
   await page.getByLabel('Confirmation').fill('DELETE');
   await page.getByRole('button', { name: 'Delete workspace data' }).click();
   await expect(page.getByRole('status')).toContainText('Workspace data deleted');
   const { data: after } = await admin.from('applications').select('id').eq('user_id', createdUsers[0]);
   expect(after).toEqual([]);
+  const {data:privateAfter}=await admin.from('jobs').select('id').eq('url',privateLink);
+  expect(privateAfter).toEqual([]);
 });
 
 });

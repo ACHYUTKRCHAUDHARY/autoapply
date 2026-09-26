@@ -17,6 +17,7 @@ Help an individual job seeker discover relevant openings, prepare accurate appli
 | Account | Email/password sign-in with protected pages | Anonymous requests redirect to login; APIs verify the user again; another user cannot read a private row. |
 | Resume | Private PDF/DOCX upload, 5 MB limit | Browser uploads to Supabase Storage; server validates path, size, signature and extractable text; prior resume can be downloaded. |
 | Consent | AI processing is explicit | Upload control stays disabled until user acknowledges Gemini processing; generated text is labelled as a draft. |
+| Portal links | Save a job from any HTTPS career portal for private scoring and drafting | User enters role details; RLS hides their saved links from other users; no portal login, scraping or submission. |
 | Jobs | Adzuna/JSearch cache with daily sync | Cron requires bearer secret; source failure is visible; shared jobs are read-only to users. |
 | Matching | Fit score and honest reasoning | Three candidates per run; paginates beyond the initial cache page; interrupted high-score drafts can retry; overlapping runs conflict. |
 | Quota | Gemini free-tier protection | Every Gemini operation uses `runJSON`; a shared database slot spaces requests across instances and fails closed if unavailable. |
@@ -29,7 +30,7 @@ Help an individual job seeker discover relevant openings, prepare accurate appli
 
 ## Nonfunctional requirements
 
-- **Authorization:** RLS on user tables and storage; `auth.uid()` validated inside definer functions; service role only in cron and isolated worker.
+- **Authorization:** RLS on user tables, private job links and storage; `auth.uid()` validated inside definer functions; service role only in cron and isolated worker.
 - **Input handling:** validate mutation payloads and file content on the server; reject cross-site mutation Origins; never put secrets into browser bundles.
 - **Performance:** cap AI work per request, paginate matches, avoid uploading 5 MB through Vercel Functions.
 - **Reliability:** recover a matching lease after a crash; retry unfinished drafts; treat external source failures separately.

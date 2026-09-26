@@ -5,16 +5,19 @@ An editorial job-search workspace built with Next.js 16 App Router, TypeScript, 
 ## Setup
 
 1. `npm install`, copy `.env.example` to `.env.local`, then fill the Supabase URL, anon key, service role key, Gemini key, Adzuna credentials, JSearch RapidAPI key and a random `CRON_SECRET`. Never expose server keys with `NEXT_PUBLIC_`.
-2. For a new project, run `supabase/schema.sql` in the Supabase SQL editor. For an existing database initialized before Phase 3, run `supabase/migrations/20260926_phase3.sql` followed by `supabase/migrations/20260926_phase4.sql`. The latter adds private resume deletion and workspace erasure.
+2. For a new project, run `supabase/schema.sql` in the Supabase SQL editor. For an existing database initialized before Phase 3, run `supabase/migrations/20260926_phase3.sql` followed by `supabase/migrations/20260926_phase4.sql` and `supabase/migrations/20260926_portal_import.sql`. These add workspace erasure and private saved job links.
 3. Set the same environment variables on Vercel. Deploy the Next.js root directory. Run `npm run dev` locally.
 4. To load jobs locally, call `GET /api/jobs/sync` with `Authorization: Bearer <CRON_SECRET>`. Vercel Hobby runs the configured cron daily. For more frequent syncs, configure an external scheduler such as cron-job.org to call the same authenticated route.
 5. Create an account, upload a text-based PDF or DOCX, and choose **Find matches**. Each run processes at most three jobs. Gemini calls use the shared `runJSON` queue and an atomic database slot (~13.6 req/min across instances); no direct SDK calls bypass it. A two-minute per-user lease rejects overlapping runs and eventually expires after a crash. Drafts and in-app alerts are created in one database transaction. You can edit a draft before submission; editing an approved draft returns it to pending review.
+
+Save a job from MyWorkMyDay, Level, Naukri, Indeed, Oracle, LinkedIn, Internshala or another HTTPS career page under **Jobs → Found a role elsewhere?**. You enter the posting link, company, title and description; AutoApply scores the private job and prepares a draft. These integrations do not fetch third-party pages, log into portals or submit applications. The worker currently previews only supported Greenhouse forms and never submits.
 
 ## Routes and features
 
 | Feature | Files |
 | --- | --- |
 | Resume extraction and profile parsing | `src/app/api/resume/extract/route.ts`, `src/app/api/resume/parse/route.ts`, `src/app/profile/page.tsx` |
+| Private portal links | `src/lib/portals.ts`, `src/components/AddJobForm.tsx`, `src/app/api/jobs/manual/route.ts`, `supabase/migrations/20260926_portal_import.sql` |
 | Shared job cache and matching | `src/lib/jobSources.ts`, `src/app/api/jobs/{sync,match}/route.ts`, `src/lib/gemini.ts` |
 | Human approval and application tracker | `src/app/api/applications/[id]/route.ts`, `src/components/ApplicationCard.tsx`, `src/app/applications/page.tsx` |
 | Follow-up and warm outreach | `src/app/api/applications/[id]/{follow-up,outreach}/route.ts`, `src/components/ApplicationCard.tsx` |

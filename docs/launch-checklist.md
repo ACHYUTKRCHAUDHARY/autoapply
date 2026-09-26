@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- [ ] Create Supabase Auth project and run `supabase/schema.sql` on a new database, or apply Phase 3 then Phase 4 migrations to an existing Phase 2 database.
+- [ ] Create Supabase Auth project and run `supabase/schema.sql` on a new database, or apply Phase 3, Phase 4 and portal import migrations to an existing Phase 2 database.
 - [ ] Set Vercel variables from `.env.example`; keep service-role and API keys server-side.
 - [ ] Configure Supabase Auth redirect URLs and production domain.
 - [ ] Confirm Adzuna and JSearch credentials; call authenticated sync route once and inspect cached jobs.
@@ -11,7 +11,9 @@
 
 ## Staging verification
 
-- [ ] Sign in as user A and B; verify A cannot read B's profile, resume, matches, applications, events or notifications.
+- [ ] Sign in as user A and B; verify A cannot read B's profile, resume, manually saved jobs, matches, applications, events or notifications.
+- [ ] Save sample HTTPS links from each named portal; confirm duplicate links stay unique, scripts/userinfo/localhost URLs are rejected and saved jobs are not visible to another account.
+- [ ] Verify the 100-job per-user cap and workspace deletion of private job links.
 - [ ] Upload valid PDF and DOCX, malformed files, image-only PDFs, 0-byte and >5 MB files.
 - [ ] Score enough jobs to pass page 1; verify no duplicates and a new draft notification.
 - [ ] Start two match requests; confirm one returns conflict and the lease later recovers.
